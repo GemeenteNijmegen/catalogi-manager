@@ -1,7 +1,7 @@
 import { catalogi } from "@gemeentenijmegen/modules-zgw-client";
-import { VertrouwelijkheidaanduidingEnum } from "@gemeentenijmegen/modules-zgw-client/lib/catalogi-generated-client";
+import { IndicatieInternOfExternEnum, VertrouwelijkheidaanduidingEnum } from "@gemeentenijmegen/modules-zgw-client/lib/catalogi-generated-client";
 import { readFileSync } from "fs";
-import { Configuration, ConfigurationInformatieobjecttype, ConfigurationSchema } from "./Configuration";
+import { Configuration, ConfigurationInformatieobjecttype, ConfigurationSchema, ConfigurationZaaktypeCreate } from "./Configuration";
 import { getClient } from "./setupClient";
 
 export async function update() {
@@ -21,6 +21,10 @@ export async function update() {
 
   // Catalogus aanmaken
   const cat = await catalogusAanmaken(client, configuration);
+  
+  // Zaakrtype aanmaken
+  const zaakType = await zaaktypenAanmaken(client, cat!.url, configuration.zaaktype);
+  console.log(zaakType);
 
   // Informatieobjecttypen in de catalogus aanmaken
   let informatieobjecttypen: any[] = [];
@@ -92,6 +96,65 @@ async function informatieobjecttypenAanmaken(httpClient: catalogi.HttpClient, ca
     informatieobjectcategorie: informatieobjecttype.informatieobjectcategorie
   }
   const output = await client.informatieobjecttypeCreate(input as catalogi.InformatieObjectType);
+  console.log(`${soort} creation successful!`);
+  return output.data;
+}
+
+async function zaaktypenAanmaken(httpClient: catalogi.HttpClient, catalogus: string, zaaktype: ConfigurationZaaktypeCreate) {
+  // TODO
+  const soort = 'zaaktype';
+  const client = new catalogi.Zaaktypen(httpClient);
+
+  console.log(`Checken of ${soort} bestaat (o.b.v. beschrijving)`, zaaktype.omschrijving);
+  const existing = await client.zaaktypeList({
+    catalogus: catalogus,
+    status: 'alles',
+  });
+
+  if (existing.data?.count == 1) {
+    console.log(`${soort} gevonden`);
+    return existing.data?.results?.[0];
+  }
+
+  console.log(`${soort} niet gevonden, ${soort} maken...`);
+
+  const input: catalogi.ZaakTypeCreate = {
+    catalogus: catalogus,
+    omschrijving: zaaktype.omschrijving,
+    vertrouwelijkheidaanduiding: zaaktype.vertrouwelijkheidaanduiding as VertrouwelijkheidaanduidingEnum,
+    beginGeldigheid: zaaktype.beginGeldigheid,
+    indicatieInternOfExtern: zaaktype.indicatieInternOfExtern as IndicatieInternOfExternEnum,
+    handelingInitiator: zaaktype.handelingInitiator,
+    onderwerp: zaaktype.onderwerp,
+    handelingBehandelaar: zaaktype.handelingBehandelaar,
+    doorlooptijd: zaaktype.doorlooptijd,
+    opschortingEnAanhoudingMogelijk: zaaktype.opschortingEnAanhoudingMogelijk,
+    verlengingMogelijk: zaaktype.verlengingMogelijk,
+    productenOfDiensten: zaaktype.productenOfDiensten,
+    statustypen: zaaktype.statustypen,
+    resultaattypen: zaaktype.resultaattypen,
+    eigenschappen: zaaktype.eigenschappen,
+    informatieobjecttypen: zaaktype.informatieobjecttypen,
+    roltypen: zaaktype.roltypen,
+    besluittypen: zaaktype.besluittypen,
+    deelzaaktypen: zaaktype.deelzaaktypen,
+    gerelateerdeZaaktypen: zaaktype.gerelateerdeZaaktypen.map(relatie => ({
+      ...relatie,
+      aardRelatie: relatie.aardRelatie as catalogi.AardRelatieEnum
+    })),
+    versiedatum: zaaktype.versiedatum,
+    concept: zaaktype.concept,
+    url: zaaktype.url,
+    identificatie: zaaktype.identificatie,
+    doel: zaaktype.doel,
+    aanleiding: zaaktype.aanleiding,
+    publicatieIndicatie: zaaktype.publicatieIndicatie,
+    referentieproces: zaaktype.referentieproces,
+    verantwoordelijke: zaaktype.verantwoordelijke,
+    zaakobjecttypen: zaaktype.zaakobjecttypen,
+  }
+  
+  const output = await client.zaaktypeCreate(input as catalogi.ZaakTypeCreate);
   console.log(`${soort} creation successful!`);
   return output.data;
 }

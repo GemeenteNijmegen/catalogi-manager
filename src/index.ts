@@ -24,8 +24,8 @@ export async function update() {
 
   // Zaaktype aanmaken in de catalogus aanmaken
   let zaaktypen: any[] = [];
-  if (configuration.zaaktype) {
-    const promises = configuration.zaaktype?.map(zaaktype => {
+  if (configuration.zaaktypen) {
+    const promises = configuration.zaaktypen?.map(zaaktype => {
       return zaaktypenAanmaken(client, cat!.url, zaaktype);
     });
     zaaktypen = await Promise.all(promises);
@@ -109,12 +109,11 @@ async function informatieobjecttypenAanmaken(httpClient: catalogi.HttpClient, ca
 }
 
 async function zaaktypenAanmaken(httpClient: catalogi.HttpClient, catalogus: string, zaaktype: ConfigurationZaaktypeCreate) {
-  // TODO
   const soort = 'zaaktype';
   const client = new catalogi.Zaaktypen(httpClient);
 
   console.log(`Checken of ${soort} bestaat (o.b.v. beschrijving)`, zaaktype.omschrijving);
-  const existing = await client.zaaktypeList({
+  const existing = await client.zaaktypeList({ //TODO zaaktypen lijst controleren of deze al bestaat
     catalogus: catalogus,
     status: 'alles',
   });
@@ -126,7 +125,7 @@ async function zaaktypenAanmaken(httpClient: catalogi.HttpClient, catalogus: str
 
   console.log(`${soort} niet gevonden, ${soort} maken...`);
 
-  const input: catalogi.ZaakTypeCreate = {
+  const input: Partial<catalogi.ZaakTypeCreate> = {
     catalogus: catalogus,
     omschrijving: zaaktype.omschrijving,
     vertrouwelijkheidaanduiding: zaaktype.vertrouwelijkheidaanduiding as VertrouwelijkheidaanduidingEnum,
@@ -139,27 +138,17 @@ async function zaaktypenAanmaken(httpClient: catalogi.HttpClient, catalogus: str
     opschortingEnAanhoudingMogelijk: zaaktype.opschortingEnAanhoudingMogelijk,
     verlengingMogelijk: zaaktype.verlengingMogelijk,
     productenOfDiensten: zaaktype.productenOfDiensten,
-    statustypen: zaaktype.statustypen,
-    resultaattypen: zaaktype.resultaattypen,
-    eigenschappen: zaaktype.eigenschappen,
-    informatieobjecttypen: zaaktype.informatieobjecttypen,
-    roltypen: zaaktype.roltypen,
     besluittypen: zaaktype.besluittypen,
-    deelzaaktypen: zaaktype.deelzaaktypen,
     gerelateerdeZaaktypen: zaaktype.gerelateerdeZaaktypen.map(relatie => ({
       ...relatie,
       aardRelatie: relatie.aardRelatie as catalogi.AardRelatieEnum,
     })),
     versiedatum: zaaktype.versiedatum,
-    concept: zaaktype.concept,
-    url: zaaktype.url,
-    identificatie: zaaktype.identificatie,
     doel: zaaktype.doel,
     aanleiding: zaaktype.aanleiding,
     publicatieIndicatie: zaaktype.publicatieIndicatie,
     referentieproces: zaaktype.referentieproces,
     verantwoordelijke: zaaktype.verantwoordelijke,
-    zaakobjecttypen: zaaktype.zaakobjecttypen,
   };
 
   const output = await client.zaaktypeCreate(input as catalogi.ZaakTypeCreate);

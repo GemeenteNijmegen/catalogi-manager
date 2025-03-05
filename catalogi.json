@@ -19,17 +19,10 @@
   ],
   "zaaktypen": [
     {
-      "url": "https://example.com/zaaktype/1",
-      "identificatie": "ZAAKTYPE-001",
+      "catalogus": "https://example.com/catalogus",
       "omschrijving": "Aanvraag vergunning",
       "vertrouwelijkheidaanduiding": "intern",
-      "doel": "Het behandelen van vergunningaanvragen",
-      "aanleiding": "Aanvraag door burger",
-      "referentieproces": {
-        "naam": "Vergunningenproces",
-        "link": "https://example.com/proces/vergunningen"
-      },
-      "verantwoordelijke": "Afdeling Vergunningen",
+      "beginGeldigheid": "2025-01-01",
       "indicatieInternOfExtern": "intern",
       "handelingInitiator": "Aanvraag indienen",
       "onderwerp": "Vergunning",
@@ -37,51 +30,30 @@
       "doorlooptijd": "P30D",
       "opschortingEnAanhoudingMogelijk": true,
       "verlengingMogelijk": true,
-      "publicatieIndicatie": false,
       "productenOfDiensten": [
-        "Vergunning verlenen",
-        "Vergunning afwijzen"
-      ],
-      "catalogus": "https://example.com/catalogus",
-      "statustypen": [
-        "In behandeling",
-        "Afgehandeld"
-      ],
-      "resultaattypen": [
-        "Vergunning verleend",
-        "Vergunning afgewezen"
-      ],
-      "eigenschappen": [
-        "Eigenschap1",
-        "Eigenschap2"
-      ],
-      "informatieobjecttypen": "Formulieren",
-      "roltypen": [
-        "Aanvrager",
-        "Behandelaar"
+      "Vergunning verlenen",
+      "Vergunning afwijzen"
       ],
       "besluittypen": [
-        "Besluit1",
-        "Besluit2"
-      ],
-      "deelzaaktypen": [
-        "Deelzaaktype1",
-        "Deelzaaktype2"
+      "Besluit1",
+      "Besluit2"
       ],
       "gerelateerdeZaaktypen": [
-        {
-          "zaaktype": "https://example.com/zaaktype/2",
-          "aardRelatie": "vervolg",
-          "toelichting": "Vervolgzaak na vergunningverlening"
-        }
+      {
+        "zaaktype": "https://example.com/zaaktype/2",
+        "aardRelatie": "vervolg",
+        "toelichting": "Vervolgzaak na vergunningverlening"
+      }
       ],
-      "beginGeldigheid": "2025-01-01",
       "versiedatum": "2025-01-01",
-      "concept": false,
-      "zaakobjecttypen": [
-        "Objecttype1",
-        "Objecttype2"
-      ]
+      "doel": "Het behandelen van vergunningaanvragen",
+      "aanleiding": "Aanvraag door burger",
+      "publicatieIndicatie": false,
+      "referentieproces": {
+      "naam": "Vergunningenproces",
+      "link": "https://example.com/proces/vergunningen"
+      },
+      "verantwoordelijke": "Afdeling Vergunningen"
     }
   ]
 }

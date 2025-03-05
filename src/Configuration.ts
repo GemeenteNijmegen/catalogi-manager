@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const ConfigurationZaaktypeCreateSchema = z.object({
-  url: z.string().url().min(1).max(1000),
-  identificatie: z.string().max(50),
+  url: z.string().url().min(1).max(1000).optional(),
+  identificatie: z.string().max(50).optional(),
   omschrijving: z.string().max(80),
   vertrouwelijkheidaanduiding: z.enum([
     'openbaar',
@@ -31,13 +31,13 @@ export const ConfigurationZaaktypeCreateSchema = z.object({
   publicatieIndicatie: z.boolean(),
   productenOfDiensten: z.array(z.string()),
   catalogus: z.string().url(),
-  statustypen: z.array(z.string()),
-  resultaattypen: z.array(z.string()),
-  eigenschappen: z.array(z.string()),
-  informatieobjecttypen: z.string(),
-  roltypen: z.array(z.string()),
+  statustypen: z.array(z.string()).optional(),
+  resultaattypen: z.array(z.string()).optional(),
+  eigenschappen: z.array(z.string()).optional(),
+  informatieobjecttypen: z.string().optional(),
+  roltypen: z.array(z.string()).optional(),
   besluittypen: z.array(z.string()),
-  deelzaaktypen: z.array(z.string()),
+  deelzaaktypen: z.array(z.string()).optional(),
   gerelateerdeZaaktypen: z.array(z.object({
     zaaktype: z.string().url().max(200),
     aardRelatie: z.enum(['vervolg', 'bijdrage', 'onderwerp']),
@@ -45,8 +45,8 @@ export const ConfigurationZaaktypeCreateSchema = z.object({
   })),
   beginGeldigheid: z.string(), // ISO 8601 date format
   versiedatum: z.string(), // ISO 8601 date format
-  concept: z.boolean(),
-  zaakobjecttypen: z.array(z.string()),
+  concept: z.boolean().optional(),
+  zaakobjecttypen: z.array(z.string()).optional(),
 });
 
 export const ConfigurationInformatieobjecttypenSchema = z.object({
@@ -71,7 +71,7 @@ export const ConfigurationSchema = z.object({
   domein: z.string().min(1).max(5),
   contactpersoonBeheerNaam: z.string().max(40),
   informatieobjecttypen: z.array(ConfigurationInformatieobjecttypenSchema).optional(),
-  zaaktype: z.array(ConfigurationZaaktypeCreateSchema).optional(),
+  zaaktypen: z.array(ConfigurationZaaktypeCreateSchema).optional(),
 });
 
 

@@ -71,7 +71,7 @@ export const ConfigurationSchema = z.object({
   domein: z.string().min(1).max(5),
   contactpersoonBeheerNaam: z.string().max(40),
   informatieobjecttypen: z.array(ConfigurationInformatieobjecttypenSchema).optional(),
-  zaaktype: ConfigurationZaaktypeCreateSchema,
+  zaaktype: z.array(ConfigurationZaaktypeCreateSchema).optional(),
 });
 
 

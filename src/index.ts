@@ -1,8 +1,8 @@
-import { catalogi } from "@gemeentenijmegen/modules-zgw-client";
-import { IndicatieInternOfExternEnum, VertrouwelijkheidaanduidingEnum } from "@gemeentenijmegen/modules-zgw-client/lib/catalogi-generated-client";
-import { readFileSync } from "fs";
-import { Configuration, ConfigurationInformatieobjecttype, ConfigurationSchema, ConfigurationZaaktypeCreate } from "./Configuration";
-import { getClient } from "./setupClient";
+import { readFileSync } from 'fs';
+import { catalogi } from '@gemeentenijmegen/modules-zgw-client';
+import { IndicatieInternOfExternEnum, VertrouwelijkheidaanduidingEnum } from '@gemeentenijmegen/modules-zgw-client/lib/catalogi-generated-client';
+import { Configuration, ConfigurationInformatieobjecttype, ConfigurationSchema, ConfigurationZaaktypeCreate } from './Configuration';
+import { getClient } from './setupClient';
 
 export async function update() {
 
@@ -21,10 +21,18 @@ export async function update() {
 
   // Catalogus aanmaken
   const cat = await catalogusAanmaken(client, configuration);
-  
-  // Zaakrtype aanmaken
-  const zaakType = await zaaktypenAanmaken(client, cat!.url, configuration.zaaktype);
-  console.log(zaakType);
+
+  // Zaaktype aanmaken in de catalogus aanmaken
+  let zaaktypen: any[] = [];
+  if (configuration.zaaktype) {
+    const promises = configuration.zaaktype?.map(zaaktype => {
+      return zaaktypenAanmaken(client, cat!.url, zaaktype);
+    });
+    zaaktypen = await Promise.all(promises);
+  } else {
+    console.log('Geen zaaktypes gevonden in de configuratie.');
+  }
+  console.log(zaaktypen);
 
   // Informatieobjecttypen in de catalogus aanmaken
   let informatieobjecttypen: any[] = [];
@@ -37,7 +45,6 @@ export async function update() {
     console.log('Geen informatieobjecttypes gevonden in de configuratie.');
   }
   console.log(informatieobjecttypen);
-
 
 
 }
@@ -63,14 +70,15 @@ async function catalogusAanmaken(client: catalogi.HttpClient, config: Configurat
     rsin: config.rsin,
     domein: config.domein,
     contactpersoonBeheerNaam: config.contactpersoonBeheerNaam,
-  }
+  };
   const catalogus = await catalogussen.catalogusCreate(catalogusInput as catalogi.Catalogus);
   console.log('Catalogus creation successful!');
   return catalogus.data;
 }
 
 
-async function informatieobjecttypenAanmaken(httpClient: catalogi.HttpClient, catalogus: string, informatieobjecttype: ConfigurationInformatieobjecttype) {
+async function informatieobjecttypenAanmaken(httpClient: catalogi.HttpClient, catalogus: string,
+  informatieobjecttype: ConfigurationInformatieobjecttype) {
   const soort = 'informatieobjecttype';
   const client = new catalogi.Informatieobjecttypen(httpClient);
 
@@ -93,8 +101,8 @@ async function informatieobjecttypenAanmaken(httpClient: catalogi.HttpClient, ca
     omschrijving: informatieobjecttype.omschrijving,
     vertrouwelijkheidaanduiding: informatieobjecttype.vertrouwelijkheidaanduiding as VertrouwelijkheidaanduidingEnum,
     beginGeldigheid: informatieobjecttype.beginGeldigheid,
-    informatieobjectcategorie: informatieobjecttype.informatieobjectcategorie
-  }
+    informatieobjectcategorie: informatieobjecttype.informatieobjectcategorie,
+  };
   const output = await client.informatieobjecttypeCreate(input as catalogi.InformatieObjectType);
   console.log(`${soort} creation successful!`);
   return output.data;
@@ -140,7 +148,7 @@ async function zaaktypenAanmaken(httpClient: catalogi.HttpClient, catalogus: str
     deelzaaktypen: zaaktype.deelzaaktypen,
     gerelateerdeZaaktypen: zaaktype.gerelateerdeZaaktypen.map(relatie => ({
       ...relatie,
-      aardRelatie: relatie.aardRelatie as catalogi.AardRelatieEnum
+      aardRelatie: relatie.aardRelatie as catalogi.AardRelatieEnum,
     })),
     versiedatum: zaaktype.versiedatum,
     concept: zaaktype.concept,
@@ -152,8 +160,8 @@ async function zaaktypenAanmaken(httpClient: catalogi.HttpClient, catalogus: str
     referentieproces: zaaktype.referentieproces,
     verantwoordelijke: zaaktype.verantwoordelijke,
     zaakobjecttypen: zaaktype.zaakobjecttypen,
-  }
-  
+  };
+
   const output = await client.zaaktypeCreate(input as catalogi.ZaakTypeCreate);
   console.log(`${soort} creation successful!`);
   return output.data;

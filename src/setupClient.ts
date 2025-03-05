@@ -1,4 +1,4 @@
-import { HttpClient } from "@gemeentenijmegen/modules-zgw-client/lib/catalogi-generated-client";
+import { HttpClient } from '@gemeentenijmegen/modules-zgw-client/lib/catalogi-generated-client';
 import * as jwt from 'jsonwebtoken';
 
 export function getClient(baseUrl: string, clientId: string, clientSecret: string) {
@@ -14,7 +14,7 @@ export function getClient(baseUrl: string, clientId: string, clientSecret: strin
       };
     },
   });
-  client.setSecurityData({ token: createToken(clientId, clientSecret) })
+  client.setSecurityData({ token: createToken(clientId, clientSecret) });
   return client;
 }
 

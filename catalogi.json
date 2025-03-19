@@ -17,6 +17,17 @@
       "informatieobjectcategorie": "Formulieren"
     }
   ],
+  "besluittypen": [
+    {
+      "catalogus": "https://example.com/catalogus",
+      "omschrijving": "Aanvraag vergunning",
+      "beginGeldigheid": "2025-01-01",
+      "informatieobjecttypen": [
+        "https://mijn-services.accp.nijmegen.nl/open-zaak/catalogi/api/v1/informatieobjecttypen/48517b21-9381-48b5-b85c-037b812478c7"
+      ],
+      "publicatieIndicatie": false
+    }
+  ],
   "zaaktypen": [
     {
       "catalogus": "https://example.com/catalogus",
@@ -29,31 +40,34 @@
       "handelingBehandelaar": "Beoordelen aanvraag",
       "doorlooptijd": "P30D",
       "opschortingEnAanhoudingMogelijk": true,
-      "verlengingMogelijk": true,
+      "verlengingMogelijk": false,
       "productenOfDiensten": [
-      "Vergunning verlenen",
-      "Vergunning afwijzen"
+        "https://example.com/product/1",
+        "https://example.com/product/2"
       ],
       "besluittypen": [
-      "Besluit1",
-      "Besluit2"
+        "https://mijn-services.accp.nijmegen.nl/open-zaak/catalogi/api/v1/besluittypen/1a4711c4-63b4-4513-8327-291453f5580e"
       ],
       "gerelateerdeZaaktypen": [
-      {
-        "zaaktype": "https://example.com/zaaktype/2",
-        "aardRelatie": "vervolg",
-        "toelichting": "Vervolgzaak na vergunningverlening"
-      }
+        {
+          "zaaktype": "https://example.com/zaaktype/2",
+          "aardRelatie": "vervolg",
+          "toelichting": "Vervolgzaak na vergunningverlening"
+        }
       ],
       "versiedatum": "2025-01-01",
       "doel": "Het behandelen van vergunningaanvragen",
       "aanleiding": "Aanvraag door burger",
       "publicatieIndicatie": false,
       "referentieproces": {
-      "naam": "Vergunningenproces",
-      "link": "https://example.com/proces/vergunningen"
+        "naam": "Vergunningenproces",
+        "link": "https://example.com/proces/vergunningen"
       },
-      "verantwoordelijke": "Afdeling Vergunningen"
+      "verantwoordelijke": "Afdeling Vergunningen",
+      "trefwoorden": [
+        "Vergunning",
+        "Aanvraag"
+      ]
     }
   ]
 }

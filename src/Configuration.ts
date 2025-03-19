@@ -1,5 +1,24 @@
 import { z } from 'zod';
 
+export const ConfigurationBesluittypeCreateSchema = z.object({
+  url: z.string().url().min(1).max(1000).optional(),
+  identificatie: z.string().max(50).optional(),
+  omschrijving: z.string().max(80),
+  vertrouwelijkheidaanduiding: z.enum([
+    'openbaar',
+    'beperkt_openbaar',
+    'intern',
+    'zaakvertrouwelijk',
+    'vertrouwelijk',
+    'confidentieel',
+    'geheim',
+    'zeer_geheim',
+  ]).optional(),
+  beginGeldigheid: z.string(), // ISO 8601 date format
+  informatieobjecttypen: z.array(z.string()),
+  publicatieIndicatie: z.boolean(),
+});
+
 export const ConfigurationZaaktypeCreateSchema = z.object({
   url: z.string().url().min(1).max(1000).optional(),
   identificatie: z.string().max(50).optional(),
@@ -47,6 +66,7 @@ export const ConfigurationZaaktypeCreateSchema = z.object({
   versiedatum: z.string(), // ISO 8601 date format
   concept: z.boolean().optional(),
   zaakobjecttypen: z.array(z.string()).optional(),
+  trefwoorden: z.array(z.string()).optional(),
 });
 
 export const ConfigurationInformatieobjecttypenSchema = z.object({
@@ -72,10 +92,12 @@ export const ConfigurationSchema = z.object({
   contactpersoonBeheerNaam: z.string().max(40),
   informatieobjecttypen: z.array(ConfigurationInformatieobjecttypenSchema).optional(),
   zaaktypen: z.array(ConfigurationZaaktypeCreateSchema).optional(),
+  besluittypen: z.array(ConfigurationBesluittypeCreateSchema).optional(),
 });
 
 
 export type Configuration = z.infer<typeof ConfigurationSchema>;
 export type ConfigurationInformatieobjecttype = z.infer<typeof ConfigurationInformatieobjecttypenSchema>;
 export type ConfigurationZaaktypeCreate = z.infer<typeof ConfigurationZaaktypeCreateSchema>;
+export type ConfigurationBesluittypeCreate = z.infer<typeof ConfigurationBesluittypeCreateSchema>;
 

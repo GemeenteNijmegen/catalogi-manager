@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { catalogi } from '@gemeentenijmegen/modules-zgw-client';
 import { IndicatieInternOfExternEnum, VertrouwelijkheidaanduidingEnum } from '@gemeentenijmegen/modules-zgw-client/lib/catalogi-generated-client';
-import { Configuration, ConfigurationInformatieobjecttype, ConfigurationSchema, ConfigurationZaaktypeCreate } from './Configuration';
+import { Configuration, ConfigurationBesluittypeCreate, ConfigurationInformatieobjecttype, ConfigurationSchema, ConfigurationZaaktypeCreate } from './Configuration';
 import { getClient } from './setupClient';
 
 export async function update() {
@@ -22,18 +22,6 @@ export async function update() {
   // Catalogus aanmaken
   const cat = await catalogusAanmaken(client, configuration);
 
-  // Zaaktype aanmaken in de catalogus aanmaken
-  let zaaktypen: any[] = [];
-  if (configuration.zaaktypen) {
-    const promises = configuration.zaaktypen?.map(zaaktype => {
-      return zaaktypenAanmaken(client, cat!.url, zaaktype);
-    });
-    zaaktypen = await Promise.all(promises);
-  } else {
-    console.log('Geen zaaktypes gevonden in de configuratie.');
-  }
-  console.log(zaaktypen);
-
   // Informatieobjecttypen in de catalogus aanmaken
   let informatieobjecttypen: any[] = [];
   if (configuration.informatieobjecttypen) {
@@ -45,6 +33,30 @@ export async function update() {
     console.log('Geen informatieobjecttypes gevonden in de configuratie.');
   }
   console.log(informatieobjecttypen);
+
+  // Besluittype aanmaken in de catalogus aanmaken
+  let besluittypen: any[] = [];
+  if (configuration.besluittypen) {
+    const promises = configuration.besluittypen?.map(besluittype => {
+      return besluitTypeAanmaken(client, cat!.url, besluittype);
+    });
+    besluittypen = await Promise.all(promises);
+  } else {
+    console.log('Geen besluittypes gevonden in de configuratie.');
+  }
+  console.log(besluittypen);
+
+  // Zaaktype aanmaken in de catalogus aanmaken
+  let zaaktypen: any[] = [];
+  if (configuration.zaaktypen) {
+    const promises = configuration.zaaktypen?.map(zaaktype => {
+      return zaaktypenAanmaken(client, cat!.url, zaaktype);
+    });
+    zaaktypen = await Promise.all(promises);
+  } else {
+    console.log('Geen zaaktypes gevonden in de configuratie.');
+  }
+  console.log(zaaktypen);
 
 
 }
@@ -108,14 +120,58 @@ async function informatieobjecttypenAanmaken(httpClient: catalogi.HttpClient, ca
   return output.data;
 }
 
+async function besluitTypeAanmaken(httpClient: catalogi.HttpClient, catalogus: string, besluitType: ConfigurationBesluittypeCreate) {
+  const soort = 'besluittype';
+  const client = new catalogi.Besluittypen(httpClient);
+
+  console.log(`Checken of ${soort} bestaat (o.b.v. omschrijving)`, besluitType.omschrijving);
+  const existing = await client.besluittypeList({
+    catalogus: catalogus,
+    status: 'alles',
+    omschrijving: besluitType.omschrijving,
+  });
+
+  if (existing.data?.count == 1) {
+    console.log(`${soort} gevonden`);
+    return existing.data?.results?.[0];
+  }
+
+  console.log(`${soort} niet gevonden, ${soort} maken...`);
+
+  const input: Partial<catalogi.BesluitTypeCreate> = {
+    catalogus: catalogus,
+    omschrijving: besluitType.omschrijving,
+    beginGeldigheid: besluitType.beginGeldigheid,
+    informatieobjecttypen: besluitType.informatieobjecttypen,
+    publicatieIndicatie: besluitType.publicatieIndicatie,
+  };
+
+  console.log('Besluittype input:', input);
+
+  try {
+    const output = await client.besluittypeCreate(input as catalogi.BesluitTypeCreate);
+    console.log(`${soort} creation successful!`);
+    return output.data;
+  } catch (error: any) {
+    if (error.response) {
+      console.error('Error response data:', error.response.data);
+    } else {
+      console.error('Error:', error.message);
+    }
+    throw error;
+  }
+}
+
 async function zaaktypenAanmaken(httpClient: catalogi.HttpClient, catalogus: string, zaaktype: ConfigurationZaaktypeCreate) {
   const soort = 'zaaktype';
   const client = new catalogi.Zaaktypen(httpClient);
 
-  console.log(`Checken of ${soort} bestaat (o.b.v. beschrijving)`, zaaktype.omschrijving);
+  console.log(`Checken of ${soort} bestaat (o.b.v. trefwoorden)`, zaaktype.trefwoorden);
   const existing = await client.zaaktypeList({ //TODO zaaktypen lijst controleren of deze al bestaat
     catalogus: catalogus,
     status: 'alles',
+    identificatie: '1',
+    //trefwoorden: ['Vergunning', 'Aanvraag'],
   });
 
   if (existing.data?.count == 1) {
@@ -151,7 +207,18 @@ async function zaaktypenAanmaken(httpClient: catalogi.HttpClient, catalogus: str
     verantwoordelijke: zaaktype.verantwoordelijke,
   };
 
-  const output = await client.zaaktypeCreate(input as catalogi.ZaakTypeCreate);
-  console.log(`${soort} creation successful!`);
-  return output.data;
+  console.log('Zaaktype input:', input);
+
+  try {
+    const output = await client.zaaktypeCreate(input as catalogi.ZaakTypeCreate);
+    console.log(`${soort} creation successful!`);
+    return output.data;
+  } catch (error: any) {
+    if (error.response) {
+      console.error('Error response data:', error.response.data);
+    } else {
+      console.error('Error:', error.message);
+    }
+    throw error;
+  }
 }

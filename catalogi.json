@@ -19,7 +19,6 @@
   ],
   "besluittypen": [
     {
-      "catalogus": "https://example.com/catalogus",
       "omschrijving": "Aanvraag vergunning TEST",
       "beginGeldigheid": "2025-01-01",
       "informatieobjecttypen": [
@@ -30,7 +29,6 @@
   ],
   "zaaktypen": [
     {
-      "catalogus": "https://example.com/catalogus",
       "omschrijving": "Aanvraag vergunning TEST",
       "vertrouwelijkheidaanduiding": "intern",
       "beginGeldigheid": "2025-01-01",
@@ -78,13 +76,11 @@
     {
       "omschrijving": "Aanvrager omschrijving TEST",
       "beginGeldigheid": "2025-01-01",
-      "omschrijvingGeneriek": "belanghebbende",
-      "zaaktype": "https://mijn-services.accp.nijmegen.nl/open-zaak/catalogi/api/v1/zaaktypen/f1724ac6-ed51-4d57-bbf3-6858e27aa9b1"
-    }
+      "omschrijvingGeneriek": "belanghebbende"
+        }
   ],
   "resultaattypen": [
     {
-      "zaaktype": "https://mijn-services.accp.nijmegen.nl/open-zaak/catalogi/api/v1/zaaktypen/f1724ac6-ed51-4d57-bbf3-6858e27aa9b1",
       "omschrijving": "Resultaattypen TEST",
       "resultaattypeomschrijving": "https://selectielijst.openzaak.nl/api/v1/resultaattypeomschrijvingen/ce8cf476-0b59-496f-8eee-957a7c6e2506",
       "selectielijstklasse": "https://selectielijst.openzaak.nl/api/v1/resultaten/e84a06ac-1bdc-4e9c-9598-a22faa562459",
@@ -97,12 +93,10 @@
   "statustypen": [
     {
       "omschrijving": "In behandeling TEST",
-      "zaaktype": "https://mijn-services.accp.nijmegen.nl/open-zaak/catalogi/api/v1/zaaktypen/f1724ac6-ed51-4d57-bbf3-6858e27aa9b1",
       "volgnummer": 1
     },
     {
       "omschrijving": "Afgehandeld TEST",
-      "zaaktype": "https://mijn-services.accp.nijmegen.nl/open-zaak/catalogi/api/v1/zaaktypen/f1724ac6-ed51-4d57-bbf3-6858e27aa9b1",
       "volgnummer": 2
     }
   ]

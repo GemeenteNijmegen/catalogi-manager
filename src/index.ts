@@ -64,46 +64,43 @@ export async function update() {
 
     // Rest van de typen aanmaken als er een nieuw zaaktype is aangemaakt
     for (const zaaktypeItem of zaaktypen) {
-      if (zaaktypeItem.nieuwZaaktype) {
 
-        // Roltype in de catalogus aanmaken
-        let roltypen: any[] = [];
-        if (configuration.roltypen) {
-          const promises = configuration.roltypen?.map((roltype: any) => {
-            return roltypenAanmaken(client, roltype, zaaktypeItem.zaaktypeItem.url);
-          });
-          roltypen = await Promise.all(promises);
-        } else {
-          console.log('Geen roltypen gevonden in de configuratie.');
-        }
-        console.log(roltypen);
-
-
-        // Resultaattype in de catalogus aanmaken
-        let resultaattypen: any[] = [];
-        if (configuration.resultaattypen) {
-          const promises = configuration.resultaattypen?.map((resultaattype: any) => {
-            return resultaattypenAanmaken(client, resultaattype, zaaktypeItem.zaaktypeItem.url);
-          });
-          resultaattypen = await Promise.all(promises);
-        } else {
-          console.log('Geen resultaattypen gevonden in de configuratie.');
-        }
-        console.log(resultaattypen);
-
-        // Statustype in de catalogus aanmaken
-        let statustypen: any[] = [];
-        if (configuration.statustypen) {
-          const promises = configuration.statustypen?.map((statustype: any) => {
-            return statustypenAanmaken(client, statustype, zaaktypeItem.zaaktypeItem.url);
-          });
-          statustypen = await Promise.all(promises);
-        } else {
-          console.log('Geen statustypen gevonden in de configuratie.');
-        }
-        console.log(statustypen);
-
+      // Roltype in de catalogus aanmaken
+      let roltypen: any[] = [];
+      if (configuration.roltypen) {
+        const promises = configuration.roltypen?.map((roltype: any) => {
+          return roltypenAanmaken(client, roltype, zaaktypeItem.zaaktypeItem.url);
+        });
+        roltypen = await Promise.all(promises);
+      } else {
+        console.log('Geen roltypen gevonden in de configuratie.');
       }
+      console.log(roltypen);
+
+
+      // Resultaattype in de catalogus aanmaken
+      let resultaattypen: any[] = [];
+      if (configuration.resultaattypen) {
+        const promises = configuration.resultaattypen?.map((resultaattype: any) => {
+          return resultaattypenAanmaken(client, resultaattype, zaaktypeItem.zaaktypeItem.url);
+        });
+        resultaattypen = await Promise.all(promises);
+      } else {
+        console.log('Geen resultaattypen gevonden in de configuratie.');
+      }
+      console.log(resultaattypen);
+
+      // Statustype in de catalogus aanmaken
+      let statustypen: any[] = [];
+      if (configuration.statustypen) {
+        const promises = configuration.statustypen?.map((statustype: any) => {
+          return statustypenAanmaken(client, statustype, zaaktypeItem.zaaktypeItem.url);
+        });
+        statustypen = await Promise.all(promises);
+      } else {
+        console.log('Geen statustypen gevonden in de configuratie.');
+      }
+      console.log(statustypen);
     }
 
   } catch (error: any) {

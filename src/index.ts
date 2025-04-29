@@ -62,9 +62,7 @@ export async function update() {
     }
     console.log(zaaktypen);
 
-    // Rest van de typen aanmaken als er een nieuw zaaktype is aangemaakt
     for (const zaaktypeItem of zaaktypen) {
-
       // Roltype in de catalogus aanmaken
       let roltypen: any[] = [];
       if (configuration.roltypen) {
@@ -76,7 +74,6 @@ export async function update() {
         console.log('Geen roltypen gevonden in de configuratie.');
       }
       console.log(roltypen);
-
 
       // Resultaattype in de catalogus aanmaken
       let resultaattypen: any[] = [];
@@ -122,16 +119,11 @@ export async function update() {
 async function catalogusAanmaken(client: catalogi.HttpClient, config: catalogi.CatalogusCreateData) {
   console.log('Checking for catalogus...');
   const catalogussen = new catalogi.Catalogussen(client);
-  console.log(config.rsin);
-  console.log(config.naam);
-  console.log(config.domein);
 
   const existingCatalogus = await catalogussen.catalogusList({
     rsin: config.rsin,
     domein: config.domein,
   });
-  console.log('Existing catalogus:', existingCatalogus.data?.results);
-  console.log('Existing catalogus count:', existingCatalogus.data?.count);
 
   if (existingCatalogus.data?.count == 1) {
     console.log('Existing catalogus found wit rsin', config.rsin);

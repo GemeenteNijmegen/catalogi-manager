@@ -122,10 +122,16 @@ export async function update() {
 async function catalogusAanmaken(client: catalogi.HttpClient, config: catalogi.CatalogusCreateData) {
   console.log('Checking for catalogus...');
   const catalogussen = new catalogi.Catalogussen(client);
+  console.log(config.rsin);
+  console.log(config.naam);
+  console.log(config.domein);
 
   const existingCatalogus = await catalogussen.catalogusList({
     rsin: config.rsin,
+    domein: config.domein,
   });
+  console.log('Existing catalogus:', existingCatalogus.data?.results);
+  console.log('Existing catalogus count:', existingCatalogus.data?.count);
 
   if (existingCatalogus.data?.count == 1) {
     console.log('Existing catalogus found wit rsin', config.rsin);
@@ -267,11 +273,6 @@ async function zaaktypenAanmaken(httpClient: catalogi.HttpClient, catalogus: str
     }
   }
 
-  // if (existing.data?.count == 1) {
-  //   console.log(`${soort} gevonden`);
-  //   return existing.data?.results?.[0];
-  // }
-
   console.log(`${soort} niet gevonden, ${soort} maken...`);
 
   const input: Partial<catalogi.ZaaktypeCreateData> = {
@@ -337,15 +338,17 @@ async function roltypenAanmaken(httpClient: catalogi.HttpClient, roltype: catalo
   const soort = 'roltype';
   const client = new catalogi.Roltypen(httpClient);
 
-  console.log(`Checken of ${soort} bestaat (o.b.v. zaaktype)`, roltype.zaaktype);
+  console.log(`Checken of ${soort} bestaat (o.b.v. zaaktype : omschrijving)`, roltype.zaaktype + ' : ' + roltype.omschrijving);
 
   const existing = await client.roltypeList({
     zaaktype: roltype.zaaktype ? roltype.zaaktype : zaaktype,
   });
 
-  if (existing.data?.count == 1) {
-    console.log(`${soort} gevonden`);
-    return existing.data?.results?.[0];
+  for (const roltypeItem of existing.data?.results ?? []) {
+    if (roltypeItem.omschrijving == roltype.omschrijving) {
+      console.log('Roltype bestaat al');
+      return roltypeItem;
+    }
   }
 
   console.log(`${soort} niet gevonden, ${soort} maken...`);
@@ -375,15 +378,17 @@ async function resultaattypenAanmaken(httpClient: catalogi.HttpClient, resultaat
   const soort = 'resultaattype';
   const client = new catalogi.Resultaattypen(httpClient);
 
-  console.log(`Checken of ${soort} bestaat (o.b.v. zaaktype)`, resultaattype.zaaktype);
+  console.log(`Checken of ${soort} bestaat (o.b.v. zaaktype : omschrijving)`, resultaattype.zaaktype + ' : ' + resultaattype.omschrijving);
 
   const existing = await client.resultaattypeList({
     zaaktype: resultaattype.zaaktype ? resultaattype.zaaktype : zaaktype,
   });
 
-  if (existing.data?.count == 1) {
-    console.log(`${soort} gevonden`);
-    return existing.data?.results?.[0];
+  for (const resultaattypeItem of existing.data?.results ?? []) {
+    if (resultaattypeItem.omschrijving == resultaattype.omschrijving) {
+      console.log('Resultaattype bestaat al');
+      return resultaattypeItem;
+    }
   }
 
   console.log(`${soort} niet gevonden, ${soort} maken...`);
@@ -427,8 +432,6 @@ async function statustypenAanmaken(httpClient: catalogi.HttpClient, statusType: 
   const existing = await client.statustypeList({
     zaaktype: statusType.zaaktype ? statusType.zaaktype : zaaktype,
   });
-
-  console.log(existing.data);
 
   let statustypeList = [];
   existing.data?.results?.forEach(async element => {

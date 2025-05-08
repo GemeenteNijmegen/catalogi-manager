@@ -80,6 +80,10 @@
       "type": "runtime"
     },
     {
+      "name": "@gemeentenijmegen/utils",
+      "type": "runtime"
+    },
+    {
       "name": "dotenv",
       "type": "runtime"
     },

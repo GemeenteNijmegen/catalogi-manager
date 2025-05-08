@@ -1,5 +1,5 @@
-import { update } from '../src';
+import { update } from "../src";
 
 test('Update', async () => {
-  await update();
+await update();
 });

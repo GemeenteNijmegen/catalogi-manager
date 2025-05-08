@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "@gemeentenijmegen/modules-zgw-client": "^0.0.4",
+    "@gemeentenijmegen/utils": "^0.0.31",
     "dotenv": "^16.4.7",
     "jsonwebtoken": "^9.0.2",
     "zod": "^3.24.2"

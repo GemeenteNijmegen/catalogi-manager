@@ -1,4 +1,5 @@
 import { typescript } from 'projen';
+
 const project = new typescript.TypeScriptProject({
   defaultReleaseBranch: 'main',
   name: 'catalogi-manager',
@@ -6,6 +7,7 @@ const project = new typescript.TypeScriptProject({
   deps: [
     'dotenv',
     '@gemeentenijmegen/modules-zgw-client',
+    '@gemeentenijmegen/utils',
     'zod',
     'jsonwebtoken',
   ],
@@ -19,4 +21,5 @@ const project = new typescript.TypeScriptProject({
   },
   gitignore: ['.env'],
 });
+
 project.synth();

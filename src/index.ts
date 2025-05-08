@@ -1,19 +1,18 @@
-import { readFileSync } from 'fs';
 import { catalogi } from '@gemeentenijmegen/modules-zgw-client';
 import { IndicatieInternOfExternEnum, OmschrijvingGeneriekEnum, VertrouwelijkheidaanduidingEnum } from '@gemeentenijmegen/modules-zgw-client/lib/catalogi-generated-client';
+import { environmentVariables } from '@gemeentenijmegen/utils';
+import { readFileSync } from 'fs';
 //import { Configuration, ConfigurationBesluittypeCreate, ConfigurationInformatieobjecttype, ConfigurationResultaattypeCreate, ConfigurationRoltypeCreate, ConfigurationSchema, ConfigurationStatustypeCreate, ConfigurationZaaktypeCreate } from './Configuration';
 import { getClient } from './setupClient';
 
 export async function update() {
 
   // Setup client
-  const clientId = process.env.ZGW_CLIENT_ID;
-  const clientSecret = process.env.ZGW_CLIENT_SECRET;
-  const baseUrl = process.env.ZGW_BASE_URL;
-  if (!clientId || !clientSecret || !baseUrl) {
-    throw Error('Missing required configuration in environment variables!');
-  }
-
+  const env = environmentVariables(['ZGW_CLIENT_ID', 'ZGW_CLIENT_SECRET', 'ZGW_BASE_URL']);
+  const clientId = env.ZGW_CLIENT_ID;
+  const clientSecret = env.ZGW_CLIENT_SECRET;
+  const baseUrl = env.ZGW_BASE_URL;
+  
   try {
     const client = getClient(baseUrl, clientId, clientSecret);
 
@@ -21,83 +20,10 @@ export async function update() {
     const configurationFile = readFileSync('./catalogi.json').toString('utf-8');
     //const configuration = ConfigurationSchema.parse(JSON.parse(configurationFile));
     const configuration = JSON.parse(configurationFile);
-
-
-    // Catalogus aanmaken
-    const cat = await catalogusAanmaken(client, configuration);
-
-    // Informatieobjecttypen in de catalogus aanmaken
-    let informatieobjecttypen: any[] = [];
-    if (configuration.informatieobjecttypen) {
-      const promises = configuration.informatieobjecttypen?.map((infoObject: any) => {
-        return informatieobjecttypenAanmaken(client, cat!.url, infoObject);
-      });
-      informatieobjecttypen = await Promise.all(promises);
-    } else {
-      console.log('Geen informatieobjecttypes gevonden in de configuratie.');
-    }
-    console.log(informatieobjecttypen);
-
-    // Besluittype in de catalogus aanmaken
-    let besluittypen: any[] = [];
-    if (configuration.besluittypen) {
-      const promises = configuration.besluittypen?.map((besluittype: any) => {
-        return besluitTypeAanmaken(client, cat!.url, besluittype);
-      });
-      besluittypen = await Promise.all(promises);
-    } else {
-      console.log('Geen besluittypes gevonden in de configuratie.');
-    }
-    console.log(besluittypen);
-
-    // Zaaktype in de catalogus aanmaken
-    let zaaktypen: any[] = [];
-    if (configuration.zaaktypen) {
-      const promises = configuration.zaaktypen?.map((zaaktype: any) => {
-        return zaaktypenAanmaken(client, cat!.url, zaaktype);
-      });
-      zaaktypen = await Promise.all(promises);
-    } else {
-      console.log('Geen zaaktypes gevonden in de configuratie.');
-    }
-    console.log(zaaktypen);
-
-    for (const zaaktypeItem of zaaktypen) {
-      // Roltype in de catalogus aanmaken
-      let roltypen: any[] = [];
-      if (configuration.roltypen) {
-        const promises = configuration.roltypen?.map((roltype: any) => {
-          return roltypenAanmaken(client, roltype, zaaktypeItem.zaaktypeItem.url);
-        });
-        roltypen = await Promise.all(promises);
-      } else {
-        console.log('Geen roltypen gevonden in de configuratie.');
-      }
-      console.log(roltypen);
-
-      // Resultaattype in de catalogus aanmaken
-      let resultaattypen: any[] = [];
-      if (configuration.resultaattypen) {
-        const promises = configuration.resultaattypen?.map((resultaattype: any) => {
-          return resultaattypenAanmaken(client, resultaattype, zaaktypeItem.zaaktypeItem.url);
-        });
-        resultaattypen = await Promise.all(promises);
-      } else {
-        console.log('Geen resultaattypen gevonden in de configuratie.');
-      }
-      console.log(resultaattypen);
-
-      // Statustype in de catalogus aanmaken
-      let statustypen: any[] = [];
-      if (configuration.statustypen) {
-        const promises = configuration.statustypen?.map((statustype: any) => {
-          return statustypenAanmaken(client, statustype, zaaktypeItem.zaaktypeItem.url);
-        });
-        statustypen = await Promise.all(promises);
-      } else {
-        console.log('Geen statustypen gevonden in de configuratie.');
-      }
-      console.log(statustypen);
+  
+    for(let catalogue of configuration) {
+      // Catalogus aanmaken
+      await createCatalogue(client, catalogue);
     }
 
   } catch (error: any) {
@@ -108,6 +34,84 @@ export async function update() {
     }
   }
 
+}
+
+async function createCatalogue(client: catalogi.v1_3_1.HttpClient<any>, configuration: any) {
+  const cat = await catalogusAanmaken(client, configuration);
+
+  // Informatieobjecttypen in de catalogus aanmaken
+  let informatieobjecttypen: any[] = [];
+  if (configuration.informatieobjecttypen) {
+    const promises = configuration.informatieobjecttypen?.map((infoObject: any) => {
+      return informatieobjecttypenAanmaken(client, cat!.url, infoObject);
+    });
+    informatieobjecttypen = await Promise.all(promises);
+  } else {
+    console.log('Geen informatieobjecttypes gevonden in de configuratie.');
+  }
+  console.log(informatieobjecttypen);
+
+  // Besluittype in de catalogus aanmaken
+  let besluittypen: any[] = [];
+  if (configuration.besluittypen) {
+    const promises = configuration.besluittypen?.map((besluittype: any) => {
+      return besluitTypeAanmaken(client, cat!.url, besluittype);
+    });
+    besluittypen = await Promise.all(promises);
+  } else {
+    console.log('Geen besluittypes gevonden in de configuratie.');
+  }
+  console.log(besluittypen);
+
+  // Zaaktype in de catalogus aanmaken
+  let zaaktypen: any[] = [];
+  if (configuration.zaaktypen) {
+    const promises = configuration.zaaktypen?.map((zaaktype: any) => {
+      return zaaktypenAanmaken(client, cat!.url, zaaktype);
+    });
+    zaaktypen = await Promise.all(promises);
+  } else {
+    console.log('Geen zaaktypes gevonden in de configuratie.');
+  }
+  console.log(zaaktypen);
+
+  for (const zaaktypeItem of zaaktypen) {
+    // Roltype in de catalogus aanmaken
+    let roltypen: any[] = [];
+    if (configuration.roltypen) {
+      const promises = configuration.roltypen?.map((roltype: any) => {
+        return roltypenAanmaken(client, roltype, zaaktypeItem.zaaktypeItem.url);
+      });
+      roltypen = await Promise.all(promises);
+    } else {
+      console.log('Geen roltypen gevonden in de configuratie.');
+    }
+    console.log(roltypen);
+
+    // Resultaattype in de catalogus aanmaken
+    let resultaattypen: any[] = [];
+    if (configuration.resultaattypen) {
+      const promises = configuration.resultaattypen?.map((resultaattype: any) => {
+        return resultaattypenAanmaken(client, resultaattype, zaaktypeItem.zaaktypeItem.url);
+      });
+      resultaattypen = await Promise.all(promises);
+    } else {
+      console.log('Geen resultaattypen gevonden in de configuratie.');
+    }
+    console.log(resultaattypen);
+
+    // Statustype in de catalogus aanmaken
+    let statustypen: any[] = [];
+    if (configuration.statustypen) {
+      const promises = configuration.statustypen?.map((statustype: any) => {
+        return statustypenAanmaken(client, statustype, zaaktypeItem.zaaktypeItem.url);
+      });
+      statustypen = await Promise.all(promises);
+    } else {
+      console.log('Geen statustypen gevonden in de configuratie.');
+    }
+    console.log(statustypen);
+  }
 }
 
 /**
@@ -126,7 +130,7 @@ async function catalogusAanmaken(client: catalogi.HttpClient, config: catalogi.C
   });
 
   if (existingCatalogus.data?.count == 1) {
-    console.log('Existing catalogus found wit rsin', config.rsin);
+    console.log('Existing catalogus found with rsin', config.rsin);
     return existingCatalogus.data?.results?.[0];
   }
 
